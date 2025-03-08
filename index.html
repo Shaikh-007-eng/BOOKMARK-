@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmark Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .edit, .delete {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+        }
+        .delete {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Bookmark Website</h2>
+    
+    <input type="text" id="name" placeholder="Enter Website Name">
+    <input type="url" id="url" placeholder="Enter Website URL">
+    <button onclick="addBookmark()">Add Bookmark</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="bookmark-list">
+            <!-- Bookmarks will be displayed here -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadBookmarks);
+
+        function loadBookmarks() {
+            let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+            let tableBody = document.getElementById("bookmark-list");
+            tableBody.innerHTML = "";
+
+            bookmarks.forEach((bookmark, index) => {
+                let row = `<tr>
+                    <td>${bookmark.name}</td>
+                    <td><a href="${bookmark.url}" target="_blank">${bookmark.url}</a></td>
+                    <td>
+                        <button class="edit" onclick="editBookmark(${index})">Edit</button>
+                        <button class="delete" onclick="deleteBookmark(${index})">Delete</button>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function addBookmark() {
+            let name = document.getElementById("name").value.trim();
+            let url = document.getElementById("url").value.trim();
+
+            if (!name || !url) {
+                alert("Please enter both name and URL!");
+                return;
+            }
+
+            let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+            bookmarks.push({ name, url });
+            localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+
+            document.getElementById("name").value = "";
+            document.getElementById("url").value = "";
+
+            loadBookmarks();
+        }
+
+        function editBookmark(index) {
+            let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+            let newName = prompt("Enter new name:", bookmarks[index].name);
+            let newURL = prompt("Enter new URL:", bookmarks[index].url);
+
+            if (newName && newURL) {
+                bookmarks[index] = { name: newName, url: newURL };
+                localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+                loadBookmarks();
+            }
+        }
+
+        function deleteBookmark(index) {
+            let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [];
+            bookmarks.splice(index, 1);
+            localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+            loadBookmarks();
+        }
+    </script>
+
+</body>
+</html>
